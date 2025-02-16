@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interactive Calendar</title>
+<style>
+/* ... (CSS styles remain the same) */
+</style>
+</head>
+<body>
+
+<div id="counter">Selected Days: 0</div>
+<div class="calendar-container" id="calendar"></div>
+
+<script>
+const calendarContainer = document.getElementById('calendar');
+const counterDisplay = document.getElementById('counter');
+let selectedDays = new Set();
+
+const today = new Date();
+const startDate = new Date();
+startDate.setDate(today.getDate() - 183);
+
+const endDate = new Date();
+endDate.setDate(today.getDate() + 365);
+
+const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+let currentMonthYear = null;
+
+
+// Load saved state (from localStorage)
+const savedDays = localStorage.getItem('selectedDays');
+if (savedDays) {
+    selectedDays = new Set(JSON.parse(savedDays));
+}
+
+// Function to save the state
+function saveState() {
+    localStorage.setItem('selectedDays', JSON.stringify(Array.from(selectedDays)));
+}
+
+
+// Add day names row
+dayNames.forEach(dayName => {
+  const dayNameDiv = document.createElement('div');
+  dayNameDiv.classList.add('day-name');
+  dayNameDiv.textContent = dayName;
+  calendarContainer.appendChild(dayNameDiv);
+});
+
+let currentDate = new Date(startDate);
+
+while (currentDate <= endDate) {
+  const dayButton = document.createElement('button');
+  dayButton.classList.add('day');
+  dayButton.textContent = currentDate.getDate();
+  dayButton.date = currentDate.toISOString().slice(0, 10);
+
+  // Set selected class if day was previously selected
+  if (selectedDays.has(dayButton.date)) {
+      dayButton.classList.add('selected');
+  }
+
+
+  const monthYearString = currentDate.toLocaleString('default', { month: 'short', year: 'numeric' });
+  if (monthYearString !== currentMonthYear) {
+    const monthYearDiv = document.createElement('div');
+    monthYearDiv.classList.add('month-year');
+    monthYearDiv.textContent = monthYearString;
+    calendarContainer.appendChild(monthYearDiv);
+    currentMonthYear = monthYearString;
+  }
+
+  dayButton.addEventListener('click', () => {
+    if (selectedDays.has(dayButton.date)) {
+      selectedDays.delete(dayButton.date);
+      dayButton.classList.remove('selected');
+    } else {
+      selectedDays.add(dayButton.date);
+      dayButton.classList.add('selected');
+    }
+    counterDisplay.textContent = `Selected Days: ${selectedDays.size}`;
+    saveState(); // Save after each click
+  });
+
+  calendarContainer.appendChild(dayButton);
+
+  currentDate.setDate(currentDate.getDate() + 1);
+}
+
+</script>
+
+</body>
+</html>
