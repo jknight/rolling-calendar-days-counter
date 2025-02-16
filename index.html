@@ -5,11 +5,13 @@
 <style>
     body {
       font-family: sans-serif;
+      position: relative; /* Add this to ensure proper positioning context */
     }
     .calendar-container {
       display: grid;
-      grid-template-columns: repeat(8, 1fr); /* 8 columns (7 days + 1 week button) */
+      grid-template-columns: repeat(7, 1fr);
       gap: 2px;
+      margin-top: 20px; /* Add some space at the top */
     }
     .day {
       width: 100%;
@@ -27,9 +29,15 @@
       background-color: lightblue;
     }
     #counter {
-      font-size: 18px;
-      margin-bottom: 10px;
-      text-align: center;
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      font-size: 16px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
     }
     .month-year {
       grid-column: 1 / -1;
@@ -50,10 +58,6 @@
       cursor: pointer;
       font-size: 10px;
       padding: 0;
-    }
-    .week-notes {
-      grid-column: span 8;
-      margin-top: 5px;
     }
 </style>
 </head>
@@ -85,12 +89,9 @@ if (savedDays) {
     selectedDays = new Set(JSON.parse(savedDays));
 }
 
-const savedNotes = JSON.parse(localStorage.getItem('weekNotes')) || {};
-
 // Function to save the state
 function saveState() {
     localStorage.setItem('selectedDays', JSON.stringify(Array.from(selectedDays)));
-    localStorage.setItem('weekNotes', JSON.stringify(savedNotes));
 }
 
 
@@ -138,20 +139,6 @@ while (currentDate <= endDate) {
   });
 
   calendarContainer.appendChild(dayButton);
-
-  // Add a text box for notes next to each week
-  if (currentDate.getDay() === 6 || currentDate === endDate) {
-    const weekNotes = document.createElement('textarea');
-    weekNotes.classList.add('week-notes');
-    weekNotes.placeholder = 'Notes for this week...';
-    const weekKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${Math.floor(currentDate.getDate() / 7)}`;
-    weekNotes.value = savedNotes[weekKey] || '';
-    weekNotes.addEventListener('input', () => {
-      savedNotes[weekKey] = weekNotes.value;
-      saveState();
-    });
-    calendarContainer.appendChild(weekNotes);
-  }
 
   currentDate.setDate(currentDate.getDate() + 1);
 }
