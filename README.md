@@ -1,2 +1,8 @@
-# rolling-calendar-days-counter
-Rolling days calendar counter
+# About
+
+Rolling days calendar counter.
+
+Shows 183 days behind today and 365 ahead of today.
+
+
+https://github.com/jknight/rolling-calendar-days-counter/blob/main/index.html
