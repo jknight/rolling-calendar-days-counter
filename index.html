@@ -51,7 +51,11 @@
       font-size: 10px;
       padding: 0;
     }
-    </style>
+    .week-notes {
+      grid-column: span 8;
+      margin-top: 5px;
+    }
+</style>
 </head>
 <body>
 
@@ -81,9 +85,12 @@ if (savedDays) {
     selectedDays = new Set(JSON.parse(savedDays));
 }
 
+const savedNotes = JSON.parse(localStorage.getItem('weekNotes')) || {};
+
 // Function to save the state
 function saveState() {
     localStorage.setItem('selectedDays', JSON.stringify(Array.from(selectedDays)));
+    localStorage.setItem('weekNotes', JSON.stringify(savedNotes));
 }
 
 
@@ -131,6 +138,20 @@ while (currentDate <= endDate) {
   });
 
   calendarContainer.appendChild(dayButton);
+
+  // Add a text box for notes next to each week
+  if (currentDate.getDay() === 6 || currentDate === endDate) {
+    const weekNotes = document.createElement('textarea');
+    weekNotes.classList.add('week-notes');
+    weekNotes.placeholder = 'Notes for this week...';
+    const weekKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${Math.floor(currentDate.getDate() / 7)}`;
+    weekNotes.value = savedNotes[weekKey] || '';
+    weekNotes.addEventListener('input', () => {
+      savedNotes[weekKey] = weekNotes.value;
+      saveState();
+    });
+    calendarContainer.appendChild(weekNotes);
+  }
 
   currentDate.setDate(currentDate.getDate() + 1);
 }
